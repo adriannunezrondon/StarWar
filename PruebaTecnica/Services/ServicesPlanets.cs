@@ -26,8 +26,18 @@ namespace PruebaTecnica.Services
 
         }
 
+        public async Task<ActionResult<Planets>> FindPlanets(string url)
+        {
+            RestRequest request = new RestRequest(url);
+            var response = await _planets.ExecuteGetAsync<Planets>(request);
 
-   
+            if (!response.IsSuccessful)
+                return BadRequest();
+
+            return Ok(response.Data);
+
+        }
+
 
     }
 }

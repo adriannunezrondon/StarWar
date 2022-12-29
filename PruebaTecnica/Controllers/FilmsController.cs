@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.DTO;
 using PruebaTecnica.Services;
@@ -12,7 +12,8 @@ namespace PruebaTecnica.Controllers
     {
 
         private readonly ServicesFilms _clientFilms;
- 
+
+
 
         public FilmsController(ServicesFilms clientFilms)
         {
@@ -26,6 +27,17 @@ namespace PruebaTecnica.Controllers
         {
             return await _clientFilms.GetListFilms();
         }
+
+
+
+
+
+       
+
+
+
+
+
 
 
 

@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
-using PruebaTecnica.DataAcces;
 using PruebaTecnica.DTO;
 using PruebaTecnica.DTO.Entities.Films;
 using PruebaTecnica.DTO.Entities.Planets;
 using PruebaTecnica.Interface;
-using PruebaTecnica.Repository;
-using PruebaTecnica.Services;
+
 
 namespace PruebaTecnica.Controllers
 {
@@ -15,53 +12,60 @@ namespace PruebaTecnica.Controllers
     [ApiController]
     public class StarWarsController : ControllerBase
     {
-
         private readonly FilmsController _clientFilmsContoller;
         private readonly PlanetsController _clientPlanetsContoller;
         private readonly IFilmsRepository _IFilmsRepository;
         private readonly IPlanetsRepository _IPlanetsRepository;
-
-
-
-
-
-        public StarWarsController(FilmsController clientFilmsContoller
-                                 ,PlanetsController clientPlanetsContoller
-                                 ,IFilmsRepository IFilmsRepository
-                               //  ,IPlanetsRepository IPlanetsRepository
-                                 )
+        public StarWarsController(FilmsController clientFilmsContoller,PlanetsController clientPlanetsContoller,IFilmsRepository IFilmsRepository,IPlanetsRepository IPlanetsRepository)
         {
             _clientFilmsContoller = clientFilmsContoller;
             _clientPlanetsContoller = clientPlanetsContoller;
             _IFilmsRepository = IFilmsRepository;
-           // _IPlanetsRepository = IPlanetsRepository;
+            _IPlanetsRepository = IPlanetsRepository;
         }
 
         [HttpGet]
-        [Route("StarWars")]
+        [Route("InsertFilms")]
         public async Task<ActionResult<IEnumerable<FilmsDTOResponse>>> InsertFimlsController()
         {
 
             var films = await _clientFilmsContoller.GetListFilms();
-            var planet = await _clientPlanetsContoller.GetListPlanets();
+  
 
-            IEnumerable<Films> lista = ((films.Result as OkObjectResult).Value as FilmsDTOResponse).results;
-            Films a = lista.First();
+            List<Films> lista = ((films.Result as OkObjectResult).Value as FilmsDTOResponse).results.ToList();
 
-            List<string> listPlanetas = _IFilmsRepository.ListaPlanets(a);
+            string[] subcadena;
+            string IdPlaneta;
+            
 
-            //foreach (string url in listPlanetas)
-            //{
-            //    var planet = _IPlanetsRepository.FinDPlanet(url);
-            //}
+            foreach (Films film in lista)
+            {
+                List<string> listPlanetas = _IFilmsRepository.ListaPlanets(film);
 
-            var val = await _IFilmsRepository.InsertFilms(a);
+                var idFilmeInsertado = await _IFilmsRepository.InsertFilms(film);
 
-            return Ok(val);
+                foreach (string x in listPlanetas)
+                {
+                    subcadena = x.Split('/');
+                    IdPlaneta = subcadena[5];
+                    var planeta = await _clientPlanetsContoller.FindPlanets(x[21..]);
+                    Planets plan = ((planeta.Result as OkObjectResult).Value as Planets);
+                    var idPlanetaInsertado = await _IPlanetsRepository.InsertPlanet(plan, IdPlaneta);
+                    var idFilms_Planets = await _IPlanetsRepository.InsertPlanetINFilms_Planet(idPlanetaInsertado, idFilmeInsertado);
+                }
+            }
+
+            return Ok(films.Result);
         }
 
+        [HttpDelete]
+        [Route("DeleteFilms")]
+        public async Task<ActionResult<int>> DeleteFimlsController(int id)
+        {
 
+            return await _IFilmsRepository.DeleteFimls(id);
 
+        }
 
 
 

@@ -17,13 +17,13 @@ namespace PruebaTecnica.Services
 
         public async Task<ActionResult<IEnumerable<FilmsDTOResponse>>> GetListFilms()
         {
-            // _logger.LogInformation("Iniciando Carga de Personas");
+
             RestRequest request = new RestRequest("/films/");
             var response = await _films.ExecuteGetAsync<FilmsDTOResponse>(request);
             if (!response.IsSuccessful)
                 return BadRequest();
 
-            // _logger.LogInformation("Finalizada la Carga de Personas");
+
             return Ok(response.Data);
         }
         

@@ -1,9 +1,9 @@
 
 
-using PruebaTecnica.Controllers;
+
 using PruebaTecnica.Inject;
 using PruebaTecnica.Logger;
-using PruebaTecnica.Services;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,8 +16,7 @@ builder.Host.ConfigureLogging(logging =>
 
 
 
-// Add services to the container.
-//builder.Services.AddControllersWithViews();
+
 
 
 builder.Services.AddControllers();

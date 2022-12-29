@@ -32,6 +32,7 @@ namespace PruebaTecnica.Inject
             services.AddScoped<StarWarsController>();
 
             services.AddTransient<IFilmsRepository,FilmsRepository>();
+            services.AddTransient<IPlanetsRepository, PlanetsRepository>();
 
 
             return services;

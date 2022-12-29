@@ -7,8 +7,8 @@ namespace PruebaTecnica.Interface
     public interface IPlanetsRepository
     {
 
-        Task<ActionResult<bool>> InsertPlanet(ServicesPlanets planeta);
-        Task<ActionResult<Planets>> FinDPlanet(string url);
+        Task<ActionResult<int>> InsertPlanet(Planets planet, string id);
+        Task<ActionResult<int>> InsertPlanetINFilms_Planet(ActionResult<int> idPlaneta, ActionResult<int> idFilmes);
 
 
     }

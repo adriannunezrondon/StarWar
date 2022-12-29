@@ -9,8 +9,8 @@ namespace PruebaTecnica.Repository
 {
     public class FilmsRepository : IFilmsRepository
     {
-
-        public async Task<ActionResult<bool>> InsertFilms(Films filme)
+        int id;
+        public async Task<ActionResult<int>> InsertFilms(Films filme)
         {
             using (var conn = DAO.MySqlConnection())
             {
@@ -21,11 +21,10 @@ namespace PruebaTecnica.Repository
                     {
                         try
                         {
-
                             var queryParamts = new DynamicParameters();
                             queryParamts.Add("@title", filme.title);
-                            queryParamts.Add("@opening_crawl",filme.episode_id);
-                            queryParamts.Add("@episode_id",filme.opening_crawl);
+                            queryParamts.Add("@episode_id", filme.episode_id);
+                            queryParamts.Add("@opening_crawl", filme.opening_crawl);
                             queryParamts.Add("@director",filme.director);
                             queryParamts.Add("@producer",filme.producer);
                             queryParamts.Add("@release_date"," "/*filme.release_date*/);
@@ -36,19 +35,18 @@ namespace PruebaTecnica.Repository
                             queryParamts.Add("@species", " "/*filme.species*/);
                             queryParamts.Add("@created", filme.created);
                             queryParamts.Add("@edited", filme.edited);
-                            queryParamts.Add("@url",filme.url);
+                            queryParamts.Add("@url",filme.url);                           
 
- 
-                           await conn.QueryAsync("pruebatecnica.InsertarFilms", queryParamts, commandType: CommandType.StoredProcedure, commandTimeout: 120);
-
+                             id = await conn.ExecuteScalarAsync<int>("adrian_starwars.InsertarFilms", queryParamts, commandType: CommandType.StoredProcedure, commandTimeout: 120);
+                           
                             tran.Commit();
-                            return true;
+                            return id;
 
                         }
                         catch (Exception ex)
                         {
                             tran.Rollback();
-                            return false;
+                            return 0;
                         }
                         finally
                         {
@@ -65,8 +63,6 @@ namespace PruebaTecnica.Repository
 
 
         }
-
-
         public List<string> ListaPlanets(Films filmes)
         {
             List<string> listaPlanetas = filmes.planets.ToList();
@@ -75,9 +71,45 @@ namespace PruebaTecnica.Repository
 
         
         }
+        public async Task<ActionResult<int>> DeleteFimls(int idFilm)
+        {
+            using (var conn = DAO.MySqlConnection())
+            {
+                conn.Open();
 
-        
+                using (var tran = conn.BeginTransaction())
+                {
+                    {
+                        try
+                        {
+                            var queryParamts = new DynamicParameters();
+                            queryParamts.Add("@idFilms", idFilm);
 
+                            id = await conn.ExecuteScalarAsync<int>("adrian_starwars.DeleteFilms", queryParamts, commandType: CommandType.StoredProcedure, commandTimeout: 120);
+
+                            tran.Commit();
+                            return id;
+
+                        }
+                        catch (Exception ex)
+                        {
+                            tran.Rollback();
+                            return 0;
+                        }
+                        finally
+                        {
+                            conn.Close();
+
+                        }
+
+                    }
+
+                }
+
+
+            }
+
+        }
 
     }
 }
